@@ -1,13 +1,27 @@
-import React, { useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+/* eslint-disable no-restricted-globals */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import React, { useRef, useState, memo, useEffect } from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { createStructuredSelector } from 'reselect';
+import { useInjectReducer } from 'utils/injectReducer';
+import { useInjectSaga } from 'utils/injectSaga';
 import DescriptionPage from 'containers/DescriptionPage/Loadable';
 import Modal from 'antd/lib/modal';
 import drinksImage from 'images/trends-drinks.jpg';
-import drinkImage from 'images/drink-photography-1.jpg';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { motion } from 'framer-motion';
 import FlexDiv from '../../components/FlexDiv';
+import { getDrinks } from './actions';
+import { drinksSelector, loadingSelector } from './selectors';
+import reducer from './reducer';
+import saga from './saga';
+
+const key = 'home';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -40,8 +54,6 @@ const BodyContainer = styled.div`
 const TopDrinkContainer = styled.div`
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
-  /* justify-content: center; */
   height: 100vh;
   padding: 2em;
   width: 80%;
@@ -82,7 +94,7 @@ const StyledModal = styled(Modal)`
 function romanize(num) {
   if (isNaN(num)) return NaN;
   const digits = String(+num).split('');
-  const key = [
+  const keys = [
     '',
     'C',
     'CC',
@@ -117,14 +129,22 @@ function romanize(num) {
   let roman = '';
   let i = 3;
   // eslint-disable-next-line no-plusplus
-  while (i--) roman = (key[+digits.pop() + i * 10] || '') + roman;
+  while (i--) roman = (keys[+digits.pop() + i * 10] || '') + roman;
   return Array(+digits.join('') + 1).join('M') + roman;
 }
 
-const HomePage = () => {
+const HomePage = ({ drinks, loading, getDrinksList }) => {
+  useEffect(() => {
+    setTimeout(() => {
+      getDrinksList();
+    }, 0);
+  }, []);
+
+  useInjectReducer({ key, reducer });
+  useInjectSaga({ key, saga });
+
   const TitleRef = useRef(null);
   const CocktailsRef = useRef(null);
-  const CocktailsRef2 = useRef(null);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -139,6 +159,7 @@ const HomePage = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+
   return (
     <AppContainer>
       <HeaderContainer>
@@ -190,9 +211,12 @@ const HomePage = () => {
           assembled the world&apos;s finest cocktails that are guaranteed to get
           you in the mood. Take a look at the best rated coktails{' '}
           <a
-            onClick={() =>
-              CocktailsRef.current.scrollIntoView({ behavior: 'smooth' })
-            }
+            onClick={() => {
+              window.scrollBy({
+                top: window.innerHeight,
+                behavior: 'smooth',
+              });
+            }}
           >
             below{' '}
           </a>
@@ -200,83 +224,99 @@ const HomePage = () => {
           step. Support us by sending some fookin fresh dollars over on our
           patreon.
           <br />
-          <FlexDiv justifyContent="center" style={{ marginTop: '1em' }}>
-            <strong>~Yours truly e-commerce the bois~</strong>
-          </FlexDiv>
+          <strong>~Yours truly e-commerce the bois~</strong>
         </p>
 
         <Separator />
       </BodyContainer>
-      <TopDrinkContainer ref={CocktailsRef}>
-        <h1
-          style={{
-            fontSize: '2.5em',
-            color: '#ffff',
-            textTransform: 'uppercase',
-            fontWeight: 'bold',
-            borderRadius: '24px',
-            backgroundColor: '#333B5C',
-            padding: '0.25em 0.5em',
-            textAlign: 'center',
-          }}
-        >
-          {romanize(1)}. Manhattan
-        </h1>
-        <FlexDiv>
-          <img
-            src={drinkImage}
-            height="60%"
-            style={{ borderRadius: '24px', marginRight: '2em' }}
-            alt="drink"
-          />
-          <FlexDiv direction="column">
-            <FlexDiv
-              direction="column"
-              style={{
-                height: '35%',
-                backgroundColor: '#333B5C',
-                padding: '2em',
-                borderRadius: '24px',
-                marginBottom: '2em',
-              }}
+      {!loading ? (
+        <div>
+          {drinks.map((drink, index) => (
+            <TopDrinkContainer
+              ref={index === 0 ? CocktailsRef : null}
+              key={drink.id}
             >
-              <h1 style={{ color: '#ffff' }}>Description</h1>
-              <p style={{ fontSize: '1.5em', color: '#ffff' }}>
-                A Manhattan is a cocktail made with whiskey, sweet vermouth, and
-                bitters. While rye is the traditional whiskey of choice, other
-                commonly used whiskies include Canadian whisky, bourbon, blended
-                whiskey, and Tennessee whiskey
-              </p>
-            </FlexDiv>
-
-            <FlexDiv
-              direction="column"
-              style={{
-                height: '20%',
-                backgroundColor: '#333B5C',
-                padding: '2em',
-                borderRadius: '24px',
-              }}
-            >
-              <h1 style={{ color: '#ffff' }}>What next?</h1>
-              <FlexDiv>
-                <a style={{ fontSize: '1.5em' }} onClick={() => showModal()}>
-                  Check out its recipe&nbsp;
-                </a>
-                <p style={{ fontSize: '1.5em', color: '#ffff' }}>or&nbsp;</p>
-                <a
-                  style={{ fontSize: '1.5em' }}
-                  onClick={() =>
-                    CocktailsRef2.current.scrollIntoView({ behavior: 'smooth' })
-                  }
+              <h1
+                style={{
+                  fontSize: '2.5em',
+                  color: '#ffff',
+                  textTransform: 'uppercase',
+                  fontWeight: 'bold',
+                  borderRadius: '24px',
+                  backgroundColor: '#333B5C',
+                  padding: '0.25em 0.5em',
+                  textAlign: 'center',
+                }}
+              >
+                {romanize(index + 1)}. {drink.name}
+              </h1>
+              <FlexDiv style={{ height: '80%' }}>
+                <img
+                  src={drink.imageUrl}
+                  height="100%"
+                  style={{ borderRadius: '24px', marginRight: '2em' }}
+                  alt="drink"
+                />
+                <FlexDiv
+                  direction="column"
+                  justifyContent="space-between"
+                  style={{ height: '100%' }}
                 >
-                  See drink #2
-                </a>
+                  <FlexDiv
+                    direction="column"
+                    style={{
+                      // height: '35%',
+                      backgroundColor: '#333B5C',
+                      padding: '2em',
+                      borderRadius: '24px',
+                      marginBottom: '2em',
+                    }}
+                  >
+                    <h1 style={{ color: '#ffff' }}>Description</h1>
+                    <p style={{ fontSize: '1.5em', color: '#ffff' }}>
+                      {drink.description}
+                    </p>
+                  </FlexDiv>
+
+                  <FlexDiv
+                    direction="column"
+                    style={{
+                      // height: '20%',
+                      backgroundColor: '#333B5C',
+                      padding: '2em',
+                      borderRadius: '24px',
+                    }}
+                  >
+                    <h1 style={{ color: '#ffff' }}>Like it?</h1>
+                    <FlexDiv alignItems="center" justifyContent="space-between">
+                      <a
+                        style={{ fontSize: '1.25em' }}
+                        onClick={() => showModal()}
+                      >
+                        Find out how to make it&nbsp;
+                      </a>
+                      {drinks.length === index + 1 ? null : (
+                        <a
+                          style={{ fontSize: '1.25em' }}
+                          onClick={() =>
+                            window.scrollBy({
+                              top: window.innerHeight,
+                              behavior: 'smooth',
+                            })
+                          }
+                        >
+                          Check out another drink&nbsp;
+                        </a>
+                      )}
+                    </FlexDiv>
+                  </FlexDiv>
+                </FlexDiv>
               </FlexDiv>
-            </FlexDiv>
-          </FlexDiv>
-        </FlexDiv>
-      </TopDrinkContainer>
+            </TopDrinkContainer>
+          ))}
+        </div>
+      ) : null}
+
       <StyledModal
         title="Basic Modal"
         visible={isModalVisible}
@@ -289,69 +329,33 @@ const HomePage = () => {
       >
         <DescriptionPage />
       </StyledModal>
-      <TopDrinkContainer ref={CocktailsRef2}>
-        <h1
-          style={{
-            fontSize: '2.5em',
-            color: '#ffff',
-            textTransform: 'uppercase',
-            fontWeight: 'bold',
-            borderRadius: '24px',
-            backgroundColor: '#333B5C',
-            padding: '0.25em 0.5em',
-            textAlign: 'center',
-          }}
-        >
-          {romanize(2)}. Manhattan
-        </h1>
-        <FlexDiv>
-          <img
-            src={drinkImage}
-            height="60%"
-            style={{ borderRadius: '24px', marginRight: '2em' }}
-            alt="drink"
-          />
-          <FlexDiv direction="column">
-            <FlexDiv
-              direction="column"
-              style={{
-                height: '35%',
-                backgroundColor: '#333B5C',
-                padding: '2em',
-                borderRadius: '24px',
-                marginBottom: '2em',
-              }}
-            >
-              <h1 style={{ color: '#ffff' }}>Description</h1>
-              <p style={{ fontSize: '1.5em', color: '#ffff' }}>
-                A Manhattan is a cocktail made with whiskey, sweet vermouth, and
-                bitters. While rye is the traditional whiskey of choice, other
-                commonly used whiskies include Canadian whisky, bourbon, blended
-                whiskey, and Tennessee whiskey
-              </p>
-            </FlexDiv>
-
-            <FlexDiv
-              direction="column"
-              style={{
-                height: '20%',
-                backgroundColor: '#333B5C',
-                padding: '2em',
-                borderRadius: '24px',
-              }}
-            >
-              <h1 style={{ color: '#ffff' }}>What next?</h1>
-              <FlexDiv>
-                <a style={{ fontSize: '1.5em' }}>Check out its recipe&nbsp;</a>
-                <p style={{ fontSize: '1.5em', color: '#ffff' }}>or&nbsp;</p>
-                <a style={{ fontSize: '1.5em' }}>See drink #3</a>
-              </FlexDiv>
-            </FlexDiv>
-          </FlexDiv>
-        </FlexDiv>
-      </TopDrinkContainer>
     </AppContainer>
   );
 };
 
-export default HomePage;
+HomePage.propTypes = {
+  drinks: PropTypes.array,
+  loading: PropTypes.bool,
+  getDrinksList: PropTypes.func,
+};
+
+const mapStateToProps = createStructuredSelector({
+  drinks: drinksSelector(),
+  loading: loadingSelector(),
+});
+
+export function mapDispatchToProps(dispatch) {
+  return {
+    getDrinksList: () => dispatch(getDrinks()),
+  };
+}
+
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+);
+
+export default compose(
+  withConnect,
+  memo,
+)(HomePage);

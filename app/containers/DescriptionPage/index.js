@@ -87,7 +87,7 @@ const DescriptionPage = () => (
               margin: '0',
             }}
           >
-            Recipe
+            Instructions
           </h1>
         </FlexDiv>
       </BodyContainer>
