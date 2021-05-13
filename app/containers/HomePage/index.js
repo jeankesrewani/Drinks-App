@@ -1,5 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import DescriptionPage from 'containers/DescriptionPage/Loadable';
+import Modal from 'antd/lib/modal';
 import drinksImage from 'images/trends-drinks.jpg';
 import drinkImage from 'images/drink-photography-1.jpg';
 import DownOutlined from '@ant-design/icons/DownOutlined';
@@ -70,6 +73,12 @@ const Separator = styled.span`
   background-color: #3d679f;
 `;
 
+const StyledModal = styled(Modal)`
+  .ant-modal-header {
+    display: none;
+  }
+`;
+
 function romanize(num) {
   if (isNaN(num)) return NaN;
   const digits = String(+num).split('');
@@ -116,6 +125,20 @@ const HomePage = () => {
   const TitleRef = useRef(null);
   const CocktailsRef = useRef(null);
   const CocktailsRef2 = useRef(null);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
   return (
     <AppContainer>
       <HeaderContainer>
@@ -237,7 +260,9 @@ const HomePage = () => {
             >
               <h1 style={{ color: '#ffff' }}>What next?</h1>
               <FlexDiv>
-                <a style={{ fontSize: '1.5em' }}>Check out its recipe&nbsp;</a>
+                <a style={{ fontSize: '1.5em' }} onClick={() => showModal()}>
+                  Check out its recipe&nbsp;
+                </a>
                 <p style={{ fontSize: '1.5em', color: '#ffff' }}>or&nbsp;</p>
                 <a
                   style={{ fontSize: '1.5em' }}
@@ -252,6 +277,18 @@ const HomePage = () => {
           </FlexDiv>
         </FlexDiv>
       </TopDrinkContainer>
+      <StyledModal
+        title="Basic Modal"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+        width={700}
+        style={{ top: '0px' }}
+        bodyStyle={{ padding: '0em' }}
+      >
+        <DescriptionPage />
+      </StyledModal>
       <TopDrinkContainer ref={CocktailsRef2}>
         <h1
           style={{
