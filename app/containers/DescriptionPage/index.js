@@ -44,7 +44,7 @@ const Background = styled.div`
   align-items: center;
   background-color: rgba(26, 85, 164, 0.8);
   @media (max-width: 750px) {
-    height: 100%;
+    min-height: 100vh;
   }
 `;
 
@@ -70,6 +70,8 @@ const DescriptionPage = ({ loading, drinkInfo }) => (
             fontSize: '6em',
             color: 'white',
             margin: '0',
+            textAlign: 'center',
+            lineHeight: '1em',
           }}
         >
           {drinkInfo.name}
