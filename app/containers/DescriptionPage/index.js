@@ -97,7 +97,10 @@ const DescriptionPage = ({ loading, drinkInfo }) => (
               }}
             >
               {drinkInfo.drinkIngredientElements.map(ingredient => (
-                <li style={{ color: 'white', fontSize: '1.5em' }}>
+                <li
+                  style={{ color: 'white', fontSize: '1.5em' }}
+                  key={ingredient.id}
+                >
                   {ingredient.name}&nbsp;&nbsp;~&nbsp;&nbsp;
                   {ingredient.amount}
                   &nbsp;
