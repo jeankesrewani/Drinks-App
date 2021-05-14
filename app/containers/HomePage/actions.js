@@ -6,10 +6,24 @@ export function getDrinks() {
   };
 }
 
+export function getDrinkInfo(id) {
+  return {
+    type: constants.GET_DRINK_INFO,
+    id,
+  };
+}
+
 export function setDrinks(drinks) {
   return {
     type: constants.SET_DRINKS,
     drinks,
+  };
+}
+
+export function setDrinkInfo(drinkInfo) {
+  return {
+    type: constants.SET_DRINK_INFO,
+    drinkInfo,
   };
 }
 

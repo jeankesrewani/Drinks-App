@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -16,10 +17,15 @@ import drinksImage from 'images/trends-drinks.jpg';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { motion } from 'framer-motion';
 import FlexDiv from '../../components/FlexDiv';
-import { getDrinks } from './actions';
-import { drinksSelector, loadingSelector } from './selectors';
+import { getDrinks, getDrinkInfo } from './actions';
+import {
+  drinksSelector,
+  loadingSelector,
+  drinkInfoSelector,
+} from './selectors';
 import reducer from './reducer';
 import saga from './saga';
+import * as constants from './constants';
 
 const key = 'home';
 
@@ -133,7 +139,13 @@ function romanize(num) {
   return Array(+digits.join('') + 1).join('M') + roman;
 }
 
-const HomePage = ({ drinks, loading, getDrinksList }) => {
+const HomePage = ({
+  drinks,
+  drinkInfo,
+  loading,
+  getDrinksList,
+  getDrinkInfoById,
+}) => {
   useEffect(() => {
     setTimeout(() => {
       getDrinksList();
@@ -206,7 +218,13 @@ const HomePage = ({ drinks, loading, getDrinksList }) => {
         <h1 style={{ fontSize: '3em', color: '#3D679F ' }}>
           You look like you need a drink
         </h1>
-        <p style={{ fontSize: '1.5em', marginBottom: '2em' }}>
+        <p
+          style={{
+            fontSize: '1.5em',
+            marginBottom: '2em',
+            textAlign: 'center',
+          }}
+        >
           Lost? Don&apos;t worry, we&apos;ve got you covered as we have
           assembled the world&apos;s finest cocktails that are guaranteed to get
           you in the mood. Take a look at the best rated coktails{' '}
@@ -221,15 +239,15 @@ const HomePage = ({ drinks, loading, getDrinksList }) => {
             below{' '}
           </a>
           and click on one to learn what&apos;s in it and how to make it step by
-          step. Support us by sending some fookin fresh dollars over on our
-          patreon.
+          step.
           <br />
-          <strong>~Yours truly e-commerce the bois~</strong>
+          <strong>Yours truly ~&nbsp;the bois&nbsp;~</strong>
         </p>
 
         <Separator />
       </BodyContainer>
-      {!loading ? (
+      {loading.type !== constants.GET_DRINKS ||
+      (loading.type === constants.GET_DRINKS && loading.value === false) ? (
         <div>
           {drinks.map((drink, index) => (
             <TopDrinkContainer
@@ -257,41 +275,34 @@ const HomePage = ({ drinks, loading, getDrinksList }) => {
                   style={{ borderRadius: '24px', marginRight: '2em' }}
                   alt="drink"
                 />
+
                 <FlexDiv
                   direction="column"
+                  style={{
+                    height: '100%',
+                    backgroundColor: '#333B5C',
+                    padding: '4em 2em',
+                    borderRadius: '24px',
+                    marginBottom: '2em',
+                  }}
                   justifyContent="space-between"
-                  style={{ height: '100%' }}
                 >
-                  <FlexDiv
-                    direction="column"
-                    style={{
-                      // height: '35%',
-                      backgroundColor: '#333B5C',
-                      padding: '2em',
-                      borderRadius: '24px',
-                      marginBottom: '2em',
-                    }}
-                  >
+                  <FlexDiv direction="column">
                     <h1 style={{ color: '#ffff' }}>Description</h1>
                     <p style={{ fontSize: '1.5em', color: '#ffff' }}>
                       {drink.description}
                     </p>
                   </FlexDiv>
 
-                  <FlexDiv
-                    direction="column"
-                    style={{
-                      // height: '20%',
-                      backgroundColor: '#333B5C',
-                      padding: '2em',
-                      borderRadius: '24px',
-                    }}
-                  >
+                  <FlexDiv direction="column">
                     <h1 style={{ color: '#ffff' }}>Like it?</h1>
                     <FlexDiv alignItems="center" justifyContent="space-between">
                       <a
                         style={{ fontSize: '1.25em' }}
-                        onClick={() => showModal()}
+                        onClick={() => {
+                          showModal();
+                          getDrinkInfoById(drink.id);
+                        }}
                       >
                         Find out how to make it&nbsp;
                       </a>
@@ -327,7 +338,7 @@ const HomePage = ({ drinks, loading, getDrinksList }) => {
         style={{ top: '0px' }}
         bodyStyle={{ padding: '0em' }}
       >
-        <DescriptionPage />
+        <DescriptionPage loading={loading} drinkInfo={drinkInfo} />
       </StyledModal>
     </AppContainer>
   );
@@ -335,18 +346,22 @@ const HomePage = ({ drinks, loading, getDrinksList }) => {
 
 HomePage.propTypes = {
   drinks: PropTypes.array,
-  loading: PropTypes.bool,
+  drinkInfo: PropTypes.object,
+  loading: PropTypes.object,
   getDrinksList: PropTypes.func,
+  getDrinkInfoById: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
   drinks: drinksSelector(),
+  drinkInfo: drinkInfoSelector(),
   loading: loadingSelector(),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
     getDrinksList: () => dispatch(getDrinks()),
+    getDrinkInfoById: id => dispatch(getDrinkInfo(id)),
   };
 }
 

@@ -9,10 +9,16 @@ const drinksSelector = () =>
     homeState => homeState.drinks,
   );
 
+const drinkInfoSelector = () =>
+  createSelector(
+    selectHome,
+    homeState => homeState.drinkInfo,
+  );
+
 const loadingSelector = () =>
   createSelector(
     selectHome,
     homeState => homeState.loadingState,
   );
 
-export { drinksSelector, loadingSelector };
+export { drinksSelector, loadingSelector, drinkInfoSelector };

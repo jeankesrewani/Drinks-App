@@ -3,7 +3,8 @@ import * as constants from './constants';
 
 export const initialState = {
   drinks: [],
-  loadingState: false,
+  drinkInfo: {},
+  loadingState: { type: null, value: false },
   errorMessage: '',
 };
 
@@ -13,6 +14,9 @@ const homeReducer = (state = initialState, action) =>
     switch (action.type) {
       case constants.SET_DRINKS:
         draft.drinks = action.drinks;
+        break;
+      case constants.SET_DRINK_INFO:
+        draft.drinkInfo = action.drinkInfo;
         break;
       case constants.SET_LOADING:
         draft.loadingState = action.loading;
