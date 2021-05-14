@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Spin from 'antd/lib/spin';
-import FlexDiv from '../../components/FlexDiv';
 import * as constants from '../HomePage/constants';
 
 const Container = styled.div`
@@ -20,6 +19,9 @@ const Split = styled.span`
   width: 3px;
   height: 100%;
   background-color: #ffff;
+  @media (max-width: 750px) {
+    display: none;
+  }
 `;
 
 const BodyContainer = styled.div`
@@ -28,6 +30,10 @@ const BodyContainer = styled.div`
   height: 100%;
   width: 100%;
   justify-content: space-between;
+  @media (max-width: 750px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const Background = styled.div`
@@ -37,6 +43,20 @@ const Background = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: rgba(26, 85, 164, 0.8);
+  @media (max-width: 750px) {
+    height: 100%;
+  }
+`;
+
+const SectionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+  padding: 0em 2em;
+  @media (max-width: 750px) {
+    width: 100%;
+  }
 `;
 
 const DescriptionPage = ({ loading, drinkInfo }) => (
@@ -55,11 +75,7 @@ const DescriptionPage = ({ loading, drinkInfo }) => (
           {drinkInfo.name}
         </h1>
         <BodyContainer>
-          <FlexDiv
-            direction="column"
-            alignItems="center"
-            style={{ width: '50%', padding: '0em 2em' }}
-          >
+          <SectionContainer>
             <h1
               style={{
                 fontFamily: "'Brush Script MT', cursive",
@@ -87,13 +103,9 @@ const DescriptionPage = ({ loading, drinkInfo }) => (
                 </li>
               ))}
             </ul>
-          </FlexDiv>
+          </SectionContainer>
           <Split />
-          <FlexDiv
-            direction="column"
-            alignItems="center"
-            style={{ width: '50%', padding: '0em 2em' }}
-          >
+          <SectionContainer>
             <h1
               style={{
                 fontFamily: "'Brush Script MT', cursive",
@@ -113,7 +125,7 @@ const DescriptionPage = ({ loading, drinkInfo }) => (
             >
               {drinkInfo.instructions}
             </p>
-          </FlexDiv>
+          </SectionContainer>
         </BodyContainer>
       </Background>
     ) : (

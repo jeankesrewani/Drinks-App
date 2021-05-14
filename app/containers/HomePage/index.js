@@ -14,6 +14,7 @@ import { useInjectSaga } from 'utils/injectSaga';
 import DescriptionPage from 'containers/DescriptionPage/Loadable';
 import Modal from 'antd/lib/modal';
 import drinksImage from 'images/trends-drinks.jpg';
+import drinksImageMobile from 'images/drink-mobile.png';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { motion } from 'framer-motion';
 import FlexDiv from '../../components/FlexDiv';
@@ -44,6 +45,26 @@ const HeaderContainer = styled.div`
   background-size: 100% 100%;
   background-color: rgba(26, 85, 164, 0.8);
   background-blend-mode: soft-light;
+  @media (max-width: 750px) {
+    background-image: url(${drinksImageMobile});
+    background-color: rgba(26, 85, 164, 0.4);
+    padding-top: 5%;
+  }
+`;
+
+const HeaderTextContainer = styled.div`
+  display: flex;
+  @media (max-width: 750px) {
+    display: none;
+  }
+`;
+
+const MobileHeaderTextContainer = styled.div`
+  display: none;
+  @media (max-width: 750px) {
+    display: flex;
+    justify-content: center;
+  }
 `;
 
 const BodyContainer = styled.div`
@@ -55,6 +76,10 @@ const BodyContainer = styled.div`
   padding: 5em;
   width: 80%;
   margin: auto;
+  @media (max-width: 750px) {
+    width: 100%;
+    padding: 1em;
+  }
 `;
 
 const TopDrinkContainer = styled.div`
@@ -65,6 +90,10 @@ const TopDrinkContainer = styled.div`
   width: 80%;
   margin: auto;
   overflow: hidden;
+  @media (max-width: 750px) {
+    width: 100%;
+    height: unset;
+  }
 `;
 
 const ImageTitle = styled.h1`
@@ -83,6 +112,9 @@ const Arrow = styled(DownOutlined)`
     transition: 0.25s;
     transform: scale(1.5);
   }
+  @media (max-width: 750px) {
+    left: 45%;
+  }
 `;
 
 const Separator = styled.span`
@@ -94,6 +126,23 @@ const Separator = styled.span`
 const StyledModal = styled(Modal)`
   .ant-modal-header {
     display: none;
+  }
+`;
+
+const StyledImage = styled.img`
+  height: 100%;
+  @media (max-width: 750px) {
+    height: 50%;
+    width: 100%;
+    margin-bottom: 1em;
+  }
+`;
+
+const DescContainer = styled.div`
+  height: 80%;
+  display: flex;
+  @media (max-width: 750px) {
+    flex-direction: column;
   }
 `;
 
@@ -175,7 +224,7 @@ const HomePage = ({
   return (
     <AppContainer>
       <HeaderContainer>
-        <FlexDiv>
+        <HeaderTextContainer>
           <motion.div
             animate={{ x: 200 }}
             transition={{ ease: 'easeOut', duration: 2 }}
@@ -206,7 +255,24 @@ const HomePage = ({
           >
             <ImageTitle>k</ImageTitle>
           </motion.div>
-        </FlexDiv>
+        </HeaderTextContainer>
+        <MobileHeaderTextContainer>
+          <h1
+            style={{
+              fontSize: '6em',
+              color: '#ffff',
+              // textTransform: 'uppercase',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              letterSpacing: '0.25em',
+              fontFamily: "'Brush Script MT', cursive",
+              margin: '0',
+            }}
+          >
+            drink
+          </h1>
+        </MobileHeaderTextContainer>
+
         <Arrow
           style={{ color: 'white', fontSize: '2em' }}
           onClick={() =>
@@ -215,7 +281,7 @@ const HomePage = ({
         />
       </HeaderContainer>
       <BodyContainer ref={TitleRef}>
-        <h1 style={{ fontSize: '3em', color: '#3D679F ' }}>
+        <h1 style={{ fontSize: '3em', color: '#3D679F ', textAlign: 'center' }}>
           You look like you need a drink
         </h1>
         <p
@@ -268,8 +334,8 @@ const HomePage = ({
               >
                 {romanize(index + 1)}. {drink.name}
               </h1>
-              <FlexDiv style={{ height: '80%' }}>
-                <img
+              <DescContainer style={{ height: '80%' }}>
+                <StyledImage
                   src={drink.imageUrl}
                   height="100%"
                   style={{ borderRadius: '24px', marginRight: '2em' }}
@@ -322,7 +388,7 @@ const HomePage = ({
                     </FlexDiv>
                   </FlexDiv>
                 </FlexDiv>
-              </FlexDiv>
+              </DescContainer>
             </TopDrinkContainer>
           ))}
         </div>
