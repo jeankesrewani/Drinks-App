@@ -362,7 +362,11 @@ const HomePage = ({
 
                   <FlexDiv direction="column">
                     <h1 style={{ color: '#ffff' }}>Like it?</h1>
-                    <FlexDiv alignItems="center" justifyContent="space-between">
+                    <FlexDiv
+                      alignItems="center"
+                      justifyContent="space-between"
+                      style={{ flexWrap: 'wrap' }}
+                    >
                       <a
                         style={{ fontSize: '1.25em' }}
                         onClick={() => {
